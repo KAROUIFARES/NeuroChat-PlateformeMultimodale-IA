@@ -148,6 +148,7 @@ En cliquant sur le micro 🎙️, dictez votre message en français. Le navigate
 ## 📄 Licence - Projet académique 
 # Réalise par :
 Mohamed Fares KAROUI - 2DAD (Développement de l'interface avec html css et javascript /  réalisation du LLM )
+
 Ranim BARGUELLIL - 2SIC (Modéle de génération des images / Modéle de génération des audio TTS)
 
 ## Démo NeuroChat 
