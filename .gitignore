@@ -1,0 +1,37 @@
+# =============================================================================
+#  NeuroChat - Fichiers ignorés par Git
+#  Fichier : .gitignore
+# =============================================================================
+
+# Environnement virtuel Python
+venv/
+.venv/
+ENV/
+env/
+
+# Fichier de secrets (Variables d'environnement locales)
+.env
+
+# Cache Python et compilation
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Fichiers audio générés par la synthèse vocale (TTS)
+frontend/static/audio/*
+static/audio/*
+!static/audio/.gitkeep
+!frontend/static/audio/.gitkeep
+
+# Fichiers système ou d'éditeurs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.DS_Store
+Thumbs.db

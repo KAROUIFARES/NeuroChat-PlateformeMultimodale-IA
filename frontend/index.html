@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<!--
+=============================================================================
+  NeuroChat - Plateforme Multimodale IA (Texte, Image, Voix)
+  Fichier  : frontend/index.html
+  Rôle     : Structure HTML principale de l'application
+  Description :
+      Définit la mise en page générale de l'interface :
+        - Barre latérale (sidebar) : paramètres, LLMs, TTS, génération d'images, historique
+        - Zone principale (main)   : en-tête, zone de messages, zone de saisie
+      Toute la dynamique est gérée par app.js après chargement du DOM.
+=============================================================================
+-->
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Titre de la page (affiché dans l'onglet du navigateur) -->
+    <title>NeuroChat | Assistant Multimodal IA</title>
+
+    <!-- Description SEO -->
+    <meta name="description" content="NeuroChat — Plateforme IA multimodale combinant chat textuel, génération d'images et synthèse vocale.">
+
+    <!-- Favicon sous forme d'emoji SVG (compatible tous navigateurs modernes) -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+
+    <!-- ── Typographie : Plus Jakarta Sans (corps) + JetBrains Mono (code) ── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- ── Icônes vectorielles : Font Awesome 6 ──────────────────────────── -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- ── Coloration syntaxique : Highlight.js (thème GitHub Dark) ──────── -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+
+    <!-- ── Feuille de style principale ───────────────────────────────────── -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ======================================================================
+         CONTENEUR PRINCIPAL : flex row (sidebar + zone de chat)
+         ====================================================================== -->
+    <div class="app-container">
+
+        <!-- ================================================================
+             BARRE LATÉRALE (SIDEBAR)
+             Contient : logo, paramètres, TTS, génération d'images, historique
+             ================================================================ -->
+        <aside class="sidebar" id="sidebar">
+
+            <!-- En-tête de la sidebar : logo + bouton fermeture (mobile) -->
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fa-solid fa-brain"></i>
+                    <span>NeuroChat</span>
+                </div>
+                <button class="close-sidebar-btn" id="closeSidebarBtn" title="Fermer le menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- ── Section : Paramètres ──────────────────────────────────── -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <i class="fa-solid fa-sliders"></i> Paramètres
+                </div>
+
+                <!-- Clé API Groq (chargée depuis l'environnement ou saisie manuellement) -->
+                <div class="form-group">
+                    <label for="apiKeyInput">Clé API Groq</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="password" id="apiKeyInput"
+                            placeholder="Clé gsk_... (ou .env)">
+                    </div>
+                </div>
+
+                <!-- Sélecteur de Modèle Groq (LLM) -->
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="modelSelect">Modèle de langage (LLM)</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-robot"></i>
+                        <select id="modelSelect"
+                            style="width:100%;padding:10px 12px 10px 36px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:0.85rem;appearance:none;cursor:pointer;outline:none;transition:border-color 0.2s,box-shadow 0.2s;">
+                            <option value="llama-3.3-70b-versatile" selected>Llama 3.3 70B (Recommandé)</option>
+                            <option value="llama-3.1-8b-instant">Llama 3.1 8B (Rapide)</option>
+                            <option value="mixtral-8x7b-32768">Mixtral 8x7B (Contexte)</option>
+                            <option value="gemma2-9b-it">Gemma 2 9B (Google)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Instructions Système (Prompt Personnalisé) -->
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="systemPrompt">Instructions système (Prompt)</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-user-gear"></i>
+                        <textarea id="systemPrompt"
+                            placeholder="Ex: Réponds en français de façon concise..."
+                            style="width:100%;padding:10px 12px 10px 36px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:0.85rem;cursor:pointer;outline:none;resize:vertical;min-height:55px;transition:border-color 0.2s,box-shadow 0.2s;"></textarea>
+                    </div>
+                </div>
+
+                <!-- ── Sélecteur de moteur TTS ───────────────────────────── -->
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="ttsEngineSelect">Moteur de Voix (TTS)</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-microphone-lines"></i>
+                        <select id="ttsEngineSelect"
+                            style="width:100%;padding:10px 12px 10px 36px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:0.85rem;appearance:none;cursor:pointer;outline:none;transition:border-color 0.2s,box-shadow 0.2s;">
+                            <!-- Moteur natif du navigateur (Web Speech API) — aucune installation requise -->
+                            <option value="browser" selected>Navigateur (Speech API)</option>
+                            <!-- Moteur cloud Google — connexion internet nécessaire -->
+                            <option value="gtts">gTTS (Google TTS Cloud)</option>
+                            <!-- Moteur hors-ligne Windows (SAPI5) — via le serveur Python local -->
+                            <option value="pyttsx3">PyTTSx3 (Hors-ligne SAPI5)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ── Sélecteur de langue TTS ───────────────────────────── -->
+                <!-- Masqué par défaut, affiché uniquement pour gTTS et pyttsx3 -->
+                <div class="form-group" id="ttsLangGroup" style="margin-top: 12px; display: none;">
+                    <label for="ttsLangSelect">Langue de Synthèse</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-language"></i>
+                        <select id="ttsLangSelect"
+                            style="width:100%;padding:10px 12px 10px 36px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:0.85rem;appearance:none;cursor:pointer;outline:none;transition:border-color 0.2s,box-shadow 0.2s;">
+                            <option value="fr" selected>Français 🇫🇷</option>
+                            <option value="en">English 🇬🇧</option>
+                            <option value="ar">العربية 🇸🇦</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ── Case "Lecture automatique" ────────────────────────── -->
+                <!-- Si cochée, chaque réponse de l'IA est lue automatiquement -->
+                <div class="form-group"
+                    style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;">
+                    <input type="checkbox" id="autoSpeakCheckbox"
+                        style="cursor:pointer;width:16px;height:16px;accent-color:var(--accent-blue);">
+                    <label for="autoSpeakCheckbox"
+                        style="margin:0;cursor:pointer;font-size:0.85rem;user-select:none;color:var(--text-primary);">
+                        Lecture automatique des réponses
+                    </label>
+                </div>
+            </div>
+
+            <!-- ── Section : Génération d'Images ─────────────────────────── -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <i class="fa-solid fa-image"></i> Génération d'Images
+                </div>
+
+                <!-- URL du serveur Colab exposé via Localtunnel -->
+                <div class="form-group">
+                    <label for="colabUrlInput">URL Serveur Colab (Localtunnel)</label>
+                    <div class="input-container">
+                        <i class="fa-solid fa-link"></i>
+                        <input type="text" id="colabUrlInput"
+                            placeholder="https://xxxx.loca.lt (ou .env)">
+                    </div>
+                </div>
+
+                <!-- Bouton de test de connectivité -->
+                <button class="test-connection-btn" id="testConnectionBtn">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                    <span id="testConnectionText">Tester la connexion</span>
+                </button>
+
+                <!-- Zone d'affichage du résultat du test -->
+                <div class="connection-status" id="connectionStatus"></div>
+
+                <!-- Aide contextuelle sur la commande /image -->
+                <div class="image-tip">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Tapez <code>/image description</code> dans le chat ou utilisez le bouton ✨ de saisie.
+                </div>
+            </div>
+
+            <!-- ── Section : Nouvelle conversation ───────────────────────── -->
+            <div class="sidebar-section">
+                <button class="new-chat-btn" id="newChatBtn">
+                    <i class="fa-solid fa-plus"></i> Nouvelle Discussion
+                </button>
+            </div>
+
+            <!-- Titre de la section Historique -->
+            <div class="sidebar-section-title"
+                style="padding: 16px 24px 0 24px; margin-bottom: 0;">
+                <i class="fa-solid fa-clock-rotate-left"></i> Historique
+            </div>
+
+            <!-- ── Liste des conversations (injectée dynamiquement par app.js) -->
+            <div class="history-container" id="historyContainer">
+                <!-- Les éléments de conversation sont créés et insérés par JavaScript -->
+            </div>
+
+            <!-- Pied de page de la sidebar : statut + version -->
+            <div class="sidebar-footer">
+                <span><i class="fa-solid fa-circle-nodes"></i> NeuroChat actif</span>
+                <span>v2.0.0</span>
+            </div>
+        </aside>
+
+        <!-- ================================================================
+             ZONE PRINCIPALE DE CHAT
+             ================================================================ -->
+        <main class="chat-window">
+
+            <!-- ── En-tête du chat ───────────────────────────────────────── -->
+            <header class="chat-header">
+                <div class="header-left">
+                    <!-- Bouton hamburger (visible uniquement sur mobile) -->
+                    <button class="menu-toggle-btn icon-btn" id="menuToggleBtn" title="Ouvrir le menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <!-- Titre et modèle de la conversation active -->
+                    <div class="active-chat-info">
+                        <h2 id="chatTitle">Nouvelle discussion</h2>
+                        <p id="chatModelStatus">llama-3.3-70b-versatile</p>
+                    </div>
+                </div>
+
+                <!-- Actions de l'en-tête -->
+                <div class="header-actions">
+                    <!-- Vider l'historique de la discussion active -->
+                    <button class="icon-btn" id="clearChatBtn" title="Vider la discussion">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                    <!-- Exporter la discussion en fichier Markdown (.md) -->
+                    <button class="icon-btn" id="exportChatBtn" title="Exporter la discussion en Markdown">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ── Zone d'affichage des messages ────────────────────────── -->
+            <div class="messages-container" id="messagesContainer">
+
+                <!-- Écran d'accueil (affiché uniquement si la conversation est vide) -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-logo">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <h1>NeuroChat <span>Multimodal</span></h1>
+                    <p>
+                        Texte, Image &amp; Voix — Discutez avec l'IA, générez des images
+                        avec <code>/image</code> ou le bouton ✨, et dictez vos messages au microphone.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Bouton flottant "Défiler vers le bas" (visible si l'utilisateur remonte) -->
+            <button class="scroll-bottom-btn" id="scrollBottomBtn" title="Défiler vers le bas">
+                <i class="fa-solid fa-chevron-down"></i>
+            </button>
+
+            <!-- ── Zone de saisie ────────────────────────────────────────── -->
+            <div class="input-area">
+                <div class="input-area-inner">
+                    <div class="input-row">
+
+                        <!-- Zone de texte principale (auto-redimensionnable) -->
+                        <textarea class="chat-input" id="chatInput"
+                            placeholder="Envoyer un message à l'assistant..."
+                            rows="1"></textarea>
+
+                        <!-- Bouton Génération d'Image direct (Stable Diffusion) -->
+                        <button class="input-btn" id="imageGenBtn"
+                            title="Générer une image avec l'IA">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+
+                        <!-- Bouton microphone : reconnaissance vocale (Speech-to-Text) -->
+                        <button class="input-btn" id="voiceInputBtn"
+                            title="Dicter votre message (Speech-to-Text)">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+
+                        <!-- Bouton d'envoi (désactivé tant que la zone est vide) -->
+                        <button class="input-btn send-btn" id="sendBtn"
+                            title="Envoyer le message" disabled>
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+
+                    <!-- Pied de la zone de saisie : raccourci clavier + compteur -->
+                    <div class="input-footer">
+                        <div class="input-tips">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Entrée pour envoyer &nbsp;·&nbsp; Shift + Entrée pour une nouvelle ligne
+                        </div>
+                        <div class="char-counter" id="charCounter">0 caractères</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ========================================================================
+         BIBLIOTHÈQUES JAVASCRIPT EXTERNES (chargées via CDN)
+         ======================================================================== -->
+
+    <!-- Marked.js : conversion du Markdown en HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Highlight.js : coloration syntaxique des blocs de code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <!-- Script principal de l'application (chargé en dernier) -->
+    <script src="app.js"></script>
+
+</body>
+
+</html>

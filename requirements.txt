@@ -1,0 +1,17 @@
+# ============================================================
+#  NeuroChat - Plateforme Multimodale IA
+#  Fichier : requirements.txt
+#  Rôle    : Dépendances Python du serveur local (run.py)
+# ============================================================
+
+# Requêtes HTTP vers les API externes (Groq, Colab)
+requests>=2.31.0
+
+# Synthèse vocale hors-ligne (moteur SAPI5 sous Windows)
+pyttsx3>=2.90
+
+# Synthèse vocale cloud Google Translate
+gTTS>=2.5.4
+
+# Chargement sécurisé des variables d'environnement (.env)
+python-dotenv>=1.0.1
