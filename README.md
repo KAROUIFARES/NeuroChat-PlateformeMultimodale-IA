@@ -116,7 +116,7 @@ Vous pouvez basculer dynamiquement d'un modèle à un autre directement depuis l
 
 ## 🖼️ Génération d'images (Google Colab & Stable Diffusion)
 
-Le backend de génération d'images repose sur le notebook disponible dans [notebooks/stable_diffusion_backend.ipynb](file:///c:/Users/Fares/Desktop/projet_multimodal/notebooks/stable_diffusion_backend.ipynb).
+Le backend de génération d'images repose sur le notebook disponible dans [notebooks/stable_diffusion_backend.ipynb).
 
 ### Démarrage du serveur de calcul
 1. Importez le fichier `.ipynb` dans votre espace **Google Colab**.
@@ -145,7 +145,12 @@ En cliquant sur le micro 🎙️, dictez votre message en français. Le navigate
 
 ---
 
-## 📄 Licence
+## 📄 Licence - Projet académique 
+# Réalise par :
+Mohamed Fares KAROUI - 2DAD (Développement de l'interface avec html css et javascript /  réalisation du LLM )
+Ranim BARGUELLIL - 2SIC (Modéle de génération des images / Modéle de génération des audio TTS)
 
-Projet académique — tous droits réservés.
-<votre-nom@ecole.fr>
+## Démo NeuroChat 
+<a href="https://drive.google.com/file/d/1gPBUUE0sWq98YYNHtky5JRsHWfdQIaYE/view?usp=sharing" >Demo</a>
+
+
